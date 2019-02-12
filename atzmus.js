@@ -103,16 +103,17 @@ var COBY = new (function() {
 	this.startWebsocket = (callback) => {
 		if(this.socketURL != null) {
             
-            
+            		console.log("started socket");
 			this.cobysSocket = new WebSocket(this.socketURL);
 			this.cobysSocket.onopen = function(msg) {
-				
+				console.log("wow opened");
 				if(callback) {
 					callback(msg);
 				}
 			};
 			
             this.cobysSocket.onerror = (err) => {
+		    console.log(err);
                 switch(err.code) {
                     case "ECONNREFUSED":
                         socketReconnect();
@@ -123,7 +124,8 @@ var COBY = new (function() {
                 }
             };
             
-			this.cobysSocket.onmessage = (msg) => {
+	this.cobysSocket.onmessage = (msg) => {
+		console.log(msg);
                 if(this.socketFunctionsToDo) {
                     customSocketFunctions(msg);
                     this.onsocketmessage(msg);
