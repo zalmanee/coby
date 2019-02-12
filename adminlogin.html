@@ -1,0 +1,274 @@
+<html>
+<head>
+<script src="https://yaakovyitzchak.github.io/coby/atzmus.js"></script>
+<style>
+#error_message {
+    color:red;
+}
+
+.hidden {
+    display:none;
+}
+
+.delBtn {
+display:inline-block;
+width:25px;
+height:25px;
+background:red;
+}
+
+#general_error_box {
+    padding:5px;
+    color:red;
+    background:gray;
+}
+
+#general_message_box {
+    padding:5px;
+    color:white;
+    background:black;
+}
+</style>
+</head>
+<body>
+<script>
+var lastID = null,
+    collection = null;
+COBY.socketURL="ws://localhost:8080";
+COBY.elements = [
+    {"attributes":{"id":"loginScreen"},"parent":"container"},
+    {"attributes":{"id":"username","placeholder":"Username"}, "parent":"loginScreen", "tag":"input","eventtypes":["keyup","change"]},
+    {"attributes":{"id":"password","type":"password","placeholder":"Password"}, "parent":"loginScreen", "tag":"input","eventtypes":["keyup","change"]},
+    {"attributes":{"id":"submit"}, "parent":"loginScreen", "innerHTML":"Login!", "tag":"button","eventtypes":["click"]},
+    {"attributes":{"id":"error_message"}, "parent":"loginScreen"},
+    {"attributes":{"id":"loading_message", "class":"hidden"}, "innerHTML":"Trying to login...", "parent":"container"},
+    
+    {"attributes":{"id":"success", "class":"hidden"}, "parent":"container"},
+    {"attributes":{"id":"logout"},tag:"button",eventtypes:["click"],"parent":"success"},
+    {"attributes":{"id":"loggedin_msg"},"parent":"success"},
+    {"attributes":{"id":"databaser"},"parent":"success"},
+    {"attributes":{"id":"getListLabel"},"tag":"span","innerHTML":"Get List of ","parent":"databaser"},
+    {"attributes":{"id":"getListInput", value:"people"},"tag":"input","parent":"getListLabel","eventtypes":["change","blur"]},
+    {"attributes":{"id":"listOfPeople"},"innerHTML":"hithere","parent":"success"},
+    {"attributes":{"id":"addPersonBtn"},"innerHTML":"Add new person",tag:"button","parent":"success", eventtypes:["click"]},
+    {attributes:{"id":"general_error_box", "class":"hidden"}},
+    {attributes:{"id":"general_message_box", "class":"hidden"}}
+
+];
+
+COBY.events = {
+    "username":(e) => {
+    //   console.log(e.target.value); 
+    },
+    "password":(e) => {
+
+    },
+    "getListInput":(e) => {
+        console.log("lol");
+        getList();
+    },
+    "addPersonBtn":(e) => {
+        COBY.alert((data) => {
+            console.log(name, typeof name,password, typeof password);
+            COBY.socketSend({
+                "do database command":{
+                    "command":"insertOne",
+                    "collection":collection || "people",
+                    "query":{
+                        "name":data["username"],
+                        "password":data["password"]
+                    }
+                }
+            });
+        });
+    },
+    "logout": (e) => {
+        COBY.socketSend({
+            "logout":{}
+        });
+    },
+    "submit":(e) => {
+        var userE = c$("#username")[0];
+        var passE = c$("#password")[0];
+        var myObject = {
+            "admin login": {
+                "username":"",
+                "password":""
+            }
+        };
+        if(userE && passE) {
+            var u = userE.value,
+                p = passE.value;
+            [[
+            myObject["admin login"]["username"], myObject["admin login"]["password"
+            ]] = [u,p]];
+        }
+        COBY.socketSend((myObject));
+        var l = c$("#loading_message")[0];
+        var log = c$("#loginScreen")[0];
+        if(l) l.classList.remove("hidden");
+        if(log) log.classList.add("hidden");
+    }
+};
+
+COBY.socketFunctionsToDo = {
+    "login successful":(data) => {
+        f$("#general_message_box").classList.add("hidden");
+        showSuccess(); 
+    },
+    "incorrect password":(data) => {
+        var err = c$("#error_message")[0];
+        var l = c$("#loading_message")[0];
+        var log = c$("#loginScreen")[0];
+        if(log) log.classList.remove("hidden");
+        if(l) l.classList.add("hidden");
+        if(err) err.innerHTML = "Wrong username or password!";
+       
+    },
+    "overall success":(data) => {
+        if(data["users"]) updateList(data["users"]);
+     //   f$("#general_error_box").classList.add("hidden");
+        if(data["type of command responding to"]) {
+            var d = data["type of command responding to"];
+            var listOfResetters = ["delete", ]
+            if(d.includes("delete") || d.includes("insert") || d.includes("update")) {
+                getList();
+                console.log("wow something changed");
+            }
+        }
+        console.log("user data?", data);
+        
+    }, 
+    "message": (data) => {
+        f$("#general_message_box").classList.remove("hidden");
+        f$("#general_message_box").innerHTML = data;
+    },
+    "role NOT verified": (data) => {
+        getList();
+        f$("#general_error_box").classList.remove("hidden");
+        f$("#general_error_box").innerHTML = data["msg"];
+        setTimeout(function() {
+            f$("#general_error_box").classList.add("hidden");
+            f$("#general_error_box").innerHTML = "";
+        }, 2000);
+    },
+    "you logged out": (data) => {
+        f$("#success").classList.add("hidden");
+        f$("#loginScreen").classList.remove("hidden");
+        f$("#general_message_box").classList.remove("hidden");
+        f$("#general_message_box").innerHTML = "You logged out";
+        setTimeout(() => {
+            f$("#general_message_box").classList.add("hidden");
+        }, 2000);
+    }
+};
+
+function deleteID(_id) {
+    COBY.socketSend({
+        "do database command":{
+            "command":"deleteOne",
+            "collection":collection || "people",
+            "query":{
+                "_id":_id
+            }
+        }
+    });
+}
+
+function editTxt(_id,key,value) {
+    console.log(value);
+    var obj = {
+    "$set": {
+        }
+    }
+    
+    obj["$set"][key] = value;
+    console.log(obj);
+    COBY.socketSend({
+        "do database command":{
+            "command":"updateOne",
+            "collection":collection || "people",
+            "query":{
+                "_id":_id
+            },
+            "new values": obj
+        }
+    });
+}
+
+function updateList(data) {
+    console.log("user data got");
+    var l = f$("#listOfPeople");
+        l.innerHTML = "";
+    var index = 0;
+    for(var k in data) {
+        (function(j) {
+            var elementStr = j["name"];
+            var listRow = new COBY.element({
+            
+                parent:"listOfPeople",
+                attributes: {
+                    class:"listItem",
+                    id:"el_"+index
+                },
+                innerHTML:"<br><span onclick='deleteID(\"" + j["_id"] + "\")' class=delBtn></span>"
+            });
+            var newIndex = 0;
+            for(var o in j) {
+                var field = new COBY.element({
+                    tag:"span",
+                    parent:"el_"+index,
+                    innerHTML:o + ": <span contenteditable='true' onblur='editTxt(\"" + j["_id"] + "\",\"" + o + "\",this.innerHTML)' class=listItem>" + j[o] + "</span>, "
+                });
+                newIndex++;
+            }
+            
+        //    l.innerHTML += "<div contenteditable='true' onblur='editTxt(\"" + j["_id"] + "\",this.innerHTML)' class=listItem>" + elementStr + "</div><span onclick='deleteID(\"" + j["_id"] + "\")' class=delBtn></span>";
+        })(data[k]);
+        index++;
+    }
+}
+
+COBY.onsocketmessage = (msg) => {
+    console.log(msg);
+};
+
+function showSuccess() {
+    f$("#loading_message").classList.add("hidden");
+    f$("#loginScreen").classList.add("hidden");
+    f$("#success").classList.remove("hidden");
+}
+
+function getList() {
+    collection = f$("#getListInput").value;
+    var get = {
+        "do database command":{
+            "command":"find",
+            "wantResponse":"users",
+            "collection":collection || "people",
+            "query":{}
+        }
+    };
+    
+    COBY.socketSend((get));
+    f$("#listOfPeople").innerHTML = "getting list of users";
+}
+
+
+
+COBY.start(() => {
+    var myObject = {
+        "admin login": {
+            "username":"coby",
+            "password":"kaufer"
+        }
+    };
+    COBY.socketSend(myObject);
+});
+
+
+
+
+</script>
+</body>
+</html>
