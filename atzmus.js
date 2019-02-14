@@ -635,7 +635,7 @@ function tryToStringify(obj) {
 function strOrObj(str) {
     try {
         return JSON.parse(str);
-    } catch {
+    } catch(e) {
         return str;
     }
 }
