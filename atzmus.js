@@ -628,7 +628,7 @@ function tryToStringify(obj) {
         return JSON.stringify(obj);
     } catch(e) {
         throw e;
-        return obj;
+        return "{\"data\":\"this is empty!!\"}";
     }
 }
 
