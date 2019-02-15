@@ -377,7 +377,7 @@ this.css = (data) => {
 		    if(cur.sheet["addRule"])
                     	cur.sheet.addRule(selector,"");
 		    else if(cur.sheet["insertRule"]) 
-			cur.sheet.insertRule(seletor + "{}");
+			cur.sheet.insertRule(selector + "{}");
 	            else {
 			
 		    }
