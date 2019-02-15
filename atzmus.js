@@ -374,8 +374,15 @@ this.css = (data) => {
                     cur = document.createElement("style");
                     cur.type =  "text/css";
                     head.appendChild(cur);
-                    cur.sheet.addRule(selector,"");
-                    ruleToEdit = cur.sheet.cssRules[0];
+		    if(cur.sheet["addRule"])
+                    	cur.sheet.addRule(selector,"");
+		    else if(cur.sheet["insertRule"]) 
+			cur.sheet.insertRule(seletor + "{}");
+	            else {
+			
+		    }
+	            cur.sheet.cssRules.length > 0
+                    	ruleToEdit = cur.sheet.cssRules[0];
                     console.log("NOPE, but here's a new one:", cur);
                 }
                 applyCustomCSSruleListToExistingCSSruleList(rules, ruleToEdit, (err) => {
