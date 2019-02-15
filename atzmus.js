@@ -631,12 +631,14 @@ function isIteratable(obj) {
 }
 
 function tryToStringify(obj) {
+    var result = "";
     try {
-        return JSON.stringify(obj);
+        result = JSON.stringify(obj);
     } catch(e) {
-        throw e;
-        return "{\"data\":\"this is empty!!\"}";
+        console.log(e);
+        result = "{\"data\":\"this is empty!!\"}";
     }
+	return result;
 }
 
 function strOrObj(str) {
