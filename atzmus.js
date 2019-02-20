@@ -439,7 +439,10 @@ this.css = (data) => {
 	function addOtherElements() {
 	 	var head = document.getElementsByTagName("head")[0];
 		if(head) {
+			console.log("added head");
 			head.innerHTML += `<meta charset="utf-8"/>`;
+		} else {
+			console.log("where is the ", document);	
 		}
 	}
     
