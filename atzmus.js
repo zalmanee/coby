@@ -17,7 +17,7 @@ var COBY = new (function() {
     var keyCodes = [];
     var moving = false;
 	this.start = (callback) => {
-        makeElements();
+        	makeElements();
         
 		this.loadScripts(this.scriptsToLoad, () => {
 			this.startWebsocket(() => {
@@ -36,15 +36,15 @@ var COBY = new (function() {
 		//console.log("did it");
 		if(list.length > 0) {
 			var callback2 = (lastIndex) => {
-				console.log("yay?");
+			//	console.log("yay?");
 				if(list.length > lastIndex + 1) {
-					console.log("still got more");
+			//		console.log("still got more");
 					this.loadScript(list[lastIndex + 1], () => {
 						callback2(lastIndex + 1);
 					});
 				}  else {
 					callback();
-					console.log("oy");
+			//		console.log("oy");
 				}
 			}
 			
@@ -59,7 +59,7 @@ var COBY = new (function() {
 	this.loadScript = (url, callback) => {
 		if(!callback) {
 			callback = () => {
-				console.log("hi");
+			//	console.log("hi");
 			};
 		}
 		var outerCallback = () => {
@@ -81,7 +81,7 @@ var COBY = new (function() {
 	this.loadFile = (url, callback) => {
 		if(!callback) {
 			callback = () => {
-				console.log("hi");
+		//		console.log("hi");
 			};
 		}
 		var outerCallback = () => {
@@ -94,7 +94,7 @@ var COBY = new (function() {
 		temp.onreadystatechange = outerCallback;
 		temp.onload = outerCallback;
 		temp.onerror = (e) => {
-			console.log("there was some error or something", e);
+		//	console.log("there was some error or something", e);
 			outerCallback();
 		};
 		head.appendChild(temp);
@@ -215,14 +215,14 @@ var COBY = new (function() {
         els.forEach(x => {
            if(x["data"]["submit"]) {
             //   x["el"].addEvent = "asodk";
-               console.log(x);
+              // console.log(x);
                 sub = x["el"];
            }               
         });
         if(sub) {
             sub.innerHTML = "asdfg";
             sub["el"].onclick = () => {
-                console.log("click");
+              //  console.log("click");
                 var values = [];
                 for(var i = 0; i < els.length; i++) {
                     var c = els[i];
@@ -294,7 +294,7 @@ var COBY = new (function() {
             }
         }
         this.addEventListener = (type, func) => {
-            console.log(123);
+         
             this.el.addEventListener(type, func);
         };
        this.data = data;
@@ -309,7 +309,7 @@ var COBY = new (function() {
         });
         var el = cEl["el"];
         if(el) {
-            console.log("found element ", el);
+         //   console.log("found element ", el);
             if(isArray(json)) {
                 var a = json;
                 a.forEach(x => {
@@ -326,13 +326,13 @@ var COBY = new (function() {
             "don't add":true
         });
         var nodeSize = objSize(jsonNode);
-        console.log("node size:", nodeSize);
+ //       console.log("node size:", nodeSize);
         var index = 0;
         for(var k in jsonNode) {
             var fieldName = k;
             var field = jsonNode[k];
             var needsComma = (nodeSize > index + 1);
-            console.log("need it? ", needsComma);
+ //           console.log("need it? ", needsComma);
             var fieldEl = new this.element({
                 parentEl: holder.el,
                 tag:"span",
@@ -383,13 +383,13 @@ this.css = (data) => {
 		    }
 	            cur.sheet.cssRules.length > 0
                     	ruleToEdit = cur.sheet.cssRules[0];
-                    console.log("NOPE, but here's a new one:", cur);
+       //             console.log("NOPE, but here's a new one:", cur);
                 }
                 applyCustomCSSruleListToExistingCSSruleList(rules, ruleToEdit, (err) => {
                     if(err) {
                         console.log(err);
                     } else {
-                        console.log("successfully added ", rules, " to ", ruleToEdit);
+       //                 console.log("successfully added ", rules, " to ", ruleToEdit);
                     }
                 });
             }
@@ -409,7 +409,7 @@ this.css = (data) => {
             
             madeElements.push({"data":x["data"],"element":x["el"]});
         }
-        console.log(madeElements);
+       // console.log(madeElements);
         madeElements.forEach((x, i) => {
             var parentEl = document.body;
             var p = x["data"]["parent"];
@@ -432,7 +432,16 @@ this.css = (data) => {
         el.addEventListener(type, (e) => {
             self.events[id](e);
         });
+		
+	addOtherElements();
     }
+	
+	function addOtherElements() {
+	 	var head = document.getElementsByTagName("head")[0];
+		if(head) {
+			head.innerHTML += `<meta charset="utf-8"/>`;
+		}
+	}
     
     function customSocketFunctions(msg) {
         if(isParseable(msg["data"])) {
@@ -447,7 +456,7 @@ this.css = (data) => {
     
     function socketReconnect() {
         if(self.cobysSocket) {
-            console.log(self.cobysSocket);
+            console.log("connected to websocket with socket:", self.cobysSocket);
         //    self.cobysSocket.removeAllListeners();
             setTimeout(() => {
                 self.startWebsocket();
@@ -621,7 +630,7 @@ function f$(string) {
     var result = c$(string)[0];
     if(!result) {
         result = document.createElement("div");
-        console.log("cloudn't find " + string, " so making new thing");
+   //     console.log("cloudn't find " + string, " so making new thing");
     }
     return result;
 }
@@ -705,7 +714,7 @@ function isStringable(json) {
 
 function applyCustomCSSruleListToExistingCSSruleList(customRuleList, existingRuleList, cb) {
     var err = null;
-    console.log("trying to apply ", customRuleList, " to ", existingRuleList);
+   // console.log("trying to apply ", customRuleList, " to ", existingRuleList);
     if(customRuleList && customRuleList.constructor == Object && existingRuleList && existingRuleList.constructor == CSSStyleRule) {
         for(var k in customRuleList) {
             existingRuleList["style"][k] = customRuleList[k];
