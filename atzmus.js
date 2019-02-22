@@ -20,6 +20,7 @@ var COBY = new(function () {
     var keyCodes = [];
     var moving = false;
     var started = false;
+    var IzList = [];
 
     this.start = (callback) => {
         if(!started) {
@@ -45,6 +46,7 @@ var COBY = new(function () {
             self.onfullyloaded();
         }
     });
+    
 
     this.getKey = (index) => {
         return keyCodes[index];
@@ -120,7 +122,7 @@ var COBY = new(function () {
 
     this.startWebsocket = (callback) => {
         if (this.socketURL != null) {
-
+            console.log("just starte!");
 
             this.cobysSocket = new WebSocket(this.socketURL);
             this.cobysSocket.onopen = function (msg) {
@@ -129,7 +131,7 @@ var COBY = new(function () {
                     callback(msg);
                 }
             };
-
+            this.cobysSocket.binaryType = "blob";
             this.cobysSocket.onerror = (err) => {
                 switch (err.code) {
                     case "ECONNREFUSED":
@@ -266,34 +268,60 @@ var COBY = new(function () {
 
 
             var s = tryToStringify(msg);
-
-            this.cobysSocket.send(s);
+            if(this.cobysSocket.readyState == WebSocket.OPEN) {
+                this.cobysSocket.send(s);
+            } else {
+                console.log("the state of this socket is ", this.cobysSocket.readyState);
+            }
         }
     };
 
+    this.Iz = function(data) {
+        if(!data) {
+            data = {};
+        }
+        this.sheim = data["sheim"];
+        this.el = 
+        IzList.push(this);
+    }
 
     this.element = function (data) {
+        
         this.el = document.createElement(data["tag"] || "div");
         var x = data;
         var el = this.el;
-        if (isIteratable(x["attributes"])) {
-            for (att in x["attributes"]) {
-                el.setAttribute(att, x["attributes"][att]);
-            }
-            if (self.events[x["attributes"]["id"]]) {
-                for (var k = 0; k < x["eventtypes"].length; k++) {
-                    addEvent(el, x["attributes"]["id"], x["eventtypes"][k]);
-                }
-            } else {
+        var identifier = null;
+        var eventtypes = x["eventtypes"] || [];
+        var attributes = x["attributes"] || {};
 
+        for (att in attributes) {
+            el.setAttribute(att, attributes[att]);
+        }
+
+
+        if (attributes["id"]) {
+            identifier = attributes["id"];
+        } else {
+            identifier = x["sheim"];
+        }
+
+        if(identifier) {
+            for (var k = 0; k < eventtypes.length; k++) {
+                addEvent(el, identifier, eventtypes[k]);
             }
         }
+
         el.innerHTML = x["innerHTML"] || "";
         var appender = null;
         if (x["parent"]) {
             var potentialParent = c$("#" + x["parent"])[0];
             if (potentialParent) {
                 appender = potentialParent;
+            } else {
+                potentialParent = IzList.find(xx => xx.sheim == x["parent"]);
+                if(potentialParent) {
+                    appender = potentialParent.el; 
+                }
             }
         } else if (x["elParent"]) {
             var px = x["elParent"];
@@ -314,7 +342,12 @@ var COBY = new(function () {
             this.el.addEventListener(type, func);
         };
         this.data = data;
+        IzList.push(this);
     };
+
+    this.getIzs = () => {
+        return IzList;
+    }
 
     this.displayJSON = (json, options) => {
         var opts = options || {
@@ -429,7 +462,7 @@ var COBY = new(function () {
                 "element": x["el"]
             });
         }
-        // console.log(madeElements);
+
         madeElements.forEach((x, i) => {
             var parentEl = document.body;
             var p = x["data"]["parent"];
@@ -450,10 +483,9 @@ var COBY = new(function () {
 
     function addEvent(el, id, type) {
         el.addEventListener(type, (e) => {
-            self.events[id](e);
+            var ev = self.events[id];
+            if(ev && ev.constructor == Function) ev(e);
         });
-
-
     }
 
     function addOtherElements() {
