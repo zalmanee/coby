@@ -1,30 +1,32 @@
 
-
 var COBY = new(function () {
-
-    var self = this;
-
-
-    this.cobysSocket = null;
-    this.onready = () => {};
-    this.onfullyloaded = () => {};
-    this.onsocketmessage = (m) => {};
-    this.onsocketerror = (er) => {};
-    this.onsocketclose = (er) => {};
+    //https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-sham.min.js
+    var self = this,
+        empty = (() => {}),
+        keyCodes = [],
+        moving = false,
+        started = false,
+        IzList = [],
+        startFunctions = [],
+        onStartedEvents = () => {
+            startFunctions.forEach(x => t(x, Function) && x());
+            startFunctions = [];
+        };
+    this.cobysSocket = null,
+    this.onready = empty;
+    this.onfullyloaded = empty;
+    this.onsocketmessage = empty;
+    this.onsocketerror = empty;
+    this.onsocketclose = empty;
     this.socketURL = null;
     this.socketFunctionsToDo = null;
     this.scriptsToLoad = [];
     this.elements = [];
     this.events = {};
 
-    var keyCodes = [];
-    var moving = false;
-    var started = false;
-    var IzList = [];
-
     this.start = (callback) => {
         if(!started) {
-            makeElements();
+            makeElements(self.elements);
 
             this.loadScripts(this.scriptsToLoad, () => {
                 this.startWebsocket(() => {
@@ -37,16 +39,44 @@ var COBY = new(function () {
         }
     };
 
+    //custom property definitions
+    Object.defineProperty(Array.prototype, 'flatten', {
+        value: function(r) {
+            for (var a = this, i = 0, r = r || []; i < a.length; ++i)
+                if (a[i] != null) a[i] instanceof Array ? a[i].flatten(r) : r.push(a[i]);
+            return r
+        }
+    });
+
     document.addEventListener("readystatechange", e => {
         if(e.target.readyState === "interactive") {
             self.onready();
             self.start();
+            onStartedEvents();
         }
         if(e.target.readyState === "complete") {
             self.onfullyloaded();
         }
     });
     
+    this.go = (opts) => {
+        !opts && (opts = {});
+        var chart = {
+            elements: makeElements,
+            css: this.css,
+            socketFunctionsToDo: (data) => {
+                this.socketFunctionsToDo = addToObj(this.socketFunctionsToDo,data)
+            },
+            events: (data) => {
+                (this.events = data);
+            }
+        }
+        Object.keys(opts).forEach(x => {
+            var temp = () => t(chart[x], Function) && chart[x](opts[x]);
+            started ? temp() : startFunctions.push(temp);
+           
+        });
+    };
 
     this.getKey = (index) => {
         return keyCodes[index];
@@ -285,63 +315,68 @@ var COBY = new(function () {
         IzList.push(this);
     }
 
-    this.element = function (data) {
+    this.element = function (x) {
         
-        this.el = document.createElement(data["tag"] || "div");
-        var x = data;
-        var el = this.el;
-        var identifier = null;
-        var eventtypes = x["eventtypes"] || [];
-        var attributes = x["attributes"] || {};
+        this.el = document.createElement(x["tag"] || "div");
+        var identifier = null,
+            el = this.el,
+            eventtypes = 
+                t(x["eventtypes"],String) ?
+                    x["eventtypes"].split(" ")
+                : 
+                    t(x["eventtypes"],Array) ?
+                        x["eventtypes"]
+                :
+                    [],
+            events = t(x["events"], Object) ? x["events"] : {},
+            attributes = x["attributes"] || {},
+            exclusions = "parent attributes sheim eventtypes events",
+            potentialParent = 
+                x["elParent"] || 
+                c$("#" + x["parent"])[0] || 
+                IzList.find(xx => 
+                    t(xx.data.sheim, String) && 
+                    xx.data.sheim == x["parent"]
+                ) || 
+                document.body,
+            appender = 
+                t(potentialParent,self.element) && potentialParent.el ? 
+                    potentialParent.el
+                :
+                    potentialParent
+
+        
+
+        Object.keys(x).forEach(v => {
+            !exclusions.split(" ").includes(v) && (this.el[v] = x[v]);
+        });
+
+        Object.keys(events).forEach(e => {
+            t(events[e], Function) && 
+            t(e, String) && 
+            this.el.addEventListener(e, events[e]);
+        });
 
         for (att in attributes) {
-            el.setAttribute(att, attributes[att]);
+            this.el.setAttribute(att, attributes[att]);
         }
 
+        identifier = attributes["id"] || x["sheim"];
+        identifier ? eventtypes.forEach(k => addEvent(this.el, identifier, k)) : 0;
 
-        if (attributes["id"]) {
-            identifier = attributes["id"];
-        } else {
-            identifier = x["sheim"];
-        }
+        appender.appendChild(this.el);
+        t(x.elements,Array) && 
+        x.elements.forEach(o => {
+            t(o,Object) && (new self.element(addToObj(o, {
+                    elParent:this.el
+                })
+            ));
+        });
+            
+        
+        x["newlineAfter"] && appender.appendChild((document.createElement("br")));
 
-        if(identifier) {
-            for (var k = 0; k < eventtypes.length; k++) {
-                addEvent(el, identifier, eventtypes[k]);
-            }
-        }
-
-        el.innerHTML = x["innerHTML"] || "";
-        var appender = null;
-        if (x["parent"]) {
-            var potentialParent = c$("#" + x["parent"])[0];
-            if (potentialParent) {
-                appender = potentialParent;
-            } else {
-                potentialParent = IzList.find(xx => xx.sheim == x["parent"]);
-                if(potentialParent) {
-                    appender = potentialParent.el; 
-                }
-            }
-        } else if (x["elParent"]) {
-            var px = x["elParent"];
-            appender = px;
-        } else {
-            if (!data["don't add"])
-                appender = document.body;
-        }
-
-        if (appender && appender["appendChild"]) {
-            appender.appendChild(this.el);
-            if (x["newlineAfter"]) {
-                appender.appendChild((document.createElement("br")));
-            }
-        }
-        this.addEventListener = (type, func) => {
-
-            this.el.addEventListener(type, func);
-        };
-        this.data = data;
+        this.data = x;
         IzList.push(this);
     };
 
@@ -393,98 +428,231 @@ var COBY = new(function () {
     }
 
     this.css = (data) => {
-        var head = document.head || document.getElementsByTagName("head")[0];
-        if (head) {
-            if (data && data.constructor == Object) {
-                for (var k in data) {
-                    var selector = k;
-                    var rules = data[k];
+        (!t(data, Object)) && (data = {});
 
-                    var allSheets = document.styleSheets;
-                    var cur = null;
+        var head = document.head || document.getElementsByTagName("head")[0],
+            onError = t(data.onError, Function) ? data["onError"] : empty,
+            onSuccess = t(data.onSuccess, Function) ? data["onSuccess"] : empty,
+            allSheets = [].slice.call(document.styleSheets),
+            sheetsToWorkWith = 
+                (
+                    allSheets.length > 0 ?
+                        allSheets
+                    :
+                        [(() => {
+                            var style = head.appendChild(document.createElement("style"));
+                            style.type = "text/css";
+                            return style.sheet;
+                        })()]
+                ),
+            existingRulesToWorkWith = 
+                sheetsToWorkWith
+                    .filter(x => x && x.cssRules)
+                    .map(x=>x.cssRules)
+                    .map(x=>[].slice.call(x))
+                    .flatten()
+        head ? 
+            (() => {
+                
+                
 
-                    var indexOfPossibleRule = null,
-                        indexOfSheet = null;
-                    var selectorToModify = null;
-                    for (var i = 0; i < allSheets.length; i++) {
-                        indexOfPossibleRule = findObjPropInArray("selectorText", selector, allSheets[i].cssRules);
-                        if (indexOfPossibleRule != null) {
-                            indexOfSheet = i;
-                            break;
+                Object.keys(data).forEach(x => {
+                    !(existingRulesToWorkWith.map(x => x.selectorText).includes(x)) && (() => {
+                        var sheet = (existingRulesToWorkWith.pop() || {}).parentStyleSheet || sheetsToWorkWith[0];
+                        sheet && (() => {
+                            sheet["addRule"] && sheet.addRule(x, "");
+                            sheet["insertRule"] && sheet.insertRule(x + "{}");
+                        })();
+
+                    })();
+                    
+                })
+
+                sheetsToWorkWith.map(x => 
+                        [].slice.apply(x.cssRules)
+                    )
+                    .flatten()
+                    .filter(x => 
+                        Object.keys(data).includes(x.selectorText)
+                    ).forEach(x => {
+                        var currentProperty = data[x.selectorText];
+                        t(currentProperty, Object) ? 
+                            Object.keys(currentProperty).forEach(y => {
+                                x.style[y] = currentProperty[y];
+                            })
+                        :
+                            0
+                        
+                    });
+                console.log(sheetsToWorkWith);
+                
+
+                /*
+                
+                
+
+                sheetsToWorkWith = [].slice.call(allSheets)
+                .filter(x => 
+                    x.cssRules && [].slice.call(x.cssRules).filter(y => 
+                        Object.keys(data).includes(y.selectorText)
+                    ).length > 0
+                )
+            
+                
+                /*var sheetToWorkWith = allSheets.length > 0 ?
+                        allSheets
+                        .map(x => 
+                            [].slice.call(x.cssRules)
+                        )
+                        .filter(x =>
+                            Object.keys(data).includes(x.selectorText)
+                        )[0]
+                    :
+                        (() => {
+                            var rulesList;
+
+                            return rulesList;
+                        })()
+                var rulesToWorkWith = allSheets.length > 0 ? 
+                        allSheets
+                        .map(x => //cssRules
+                            [].slice.call(x.cssRules)
+                        )
+                        .filter(x =>
+                            Object.keys(data).includes(x.selectorText)
+                        )
+                    :
+                        (() => {
+                            var rulesList;
+
+                            return rulesList;
+                        })()
+
+                Object.keys(data).forEach(selector => {
+                    var rulesToMake = data[selector];
+                //    var 
+                });
+                */
+            })():0
+            
+            /*Object.keys(data).forEach(selector => {
+                var rules = data[selector],
+                    
+                    currentSheet = 
+                        allSheets.length > 0 ? 
+                            [].slice.call(allSheets).
+                        :
+                            3
+
+            })
+        :
+            onError({
+                type:"headError"
+            });/*
+        var tmp = (() => {
+            var head = document.head || document.getElementsByTagName("head")[0],
+                onError = t(data.onError, Function) ? data["onError"] : empty,
+                onSuccess = t(data.onSuccess, Function) ? data["onSuccess"] : empty;
+            if (head) {
+                if (t(data,Object)) {
+                    for (selector in data) {
+                            rules = data[selector],
+
+                            allSheets = document.styleSheets,
+                            cur = null,
+                            selectorToModify = null,
+                            ruleToEdit = null;
+                        
+                        console.log(Array.prototype.filter.call(
+                            allSheets,
+                            x=>Array.prototype.find.call(x.cssRules, y => y.selectorText == "button")
+                        ));
+
+                        for (var i = 0; i < allSheets.length; i++) {
+                            selectorToModify = (Array.prototype.find.call(allSheets[i].cssRules, x=>x.selectorText == selector));
+                            if(selectorToModify) break;
                         }
-                    }
+    
+                        
+                        if (selectorToModify != null) {
+                            console.log(selectorToModify)
+                            ruleToEdit = selectorToModify;
 
-                    var ruleToEdit = null;
-                    if (indexOfSheet != null) {
-
-                        ruleToEdit = allSheets[indexOfSheet].cssRules[indexOfPossibleRule];
-
-                    } else {
-                        cur = document.createElement("style");
-                        cur.type = "text/css";
-                        head.appendChild(cur);
-                        if (cur.sheet["addRule"])
-                            cur.sheet.addRule(selector, "");
-                        else if (cur.sheet["insertRule"])
-                            cur.sheet.insertRule(selector + "{}");
-                        else {
-
-                        }
-                        cur.sheet.cssRules.length > 0
-                        ruleToEdit = cur.sheet.cssRules[0];
-                        //             console.log("NOPE, but here's a new one:", cur);
-                    }
-                    applyCustomCSSruleListToExistingCSSruleList(rules, ruleToEdit, (err) => {
-                        if (err) {
-                            console.log(err);
                         } else {
-                            //                 console.log("successfully added ", rules, " to ", ruleToEdit);
+                            cur = document.createElement("style");
+                            cur.type = "text/css";
+                            head.appendChild(cur);
+                            if (cur.sheet["addRule"])
+                                cur.sheet.addRule(selector, "");
+                            else if (cur.sheet["insertRule"])
+                                cur.sheet.insertRule(selector + "{}");
+                            else {
+                                onSuccess({
+                                    type:"cssRule",
+                                    defaultMsg:"added new rule"
+                                });
+                            }
+                            cur.sheet.cssRules.length > 0
+                            ruleToEdit = cur.sheet.cssRules[0];
+                            onSuccess({
+                                type:"newSheet",
+                                defaultMsg:"Was there an existing style sheet before? NOPE, but here's a new one!"
+                            });
                         }
+                        applyCustomCSSruleListToExistingCSSruleList(rules, ruleToEdit, (err) => {
+                            if (err) {
+                                onError({
+                                    type:"cssRuleError",
+                                    defualtMsg:err
+                                });
+                            } else {
+                                onSuccess({
+                                    type:"completion",
+                                    defaultMsg:"successfully added the new style properties to ruleToEdit"
+                                })
+                                
+                            }
+                        });
+                    }
+                } else {
+                    onError({
+                        type:"wrongArgument",
+                        defualtMsg:"provide one paramter as an object containing the cssStyles, like: {\"#myID\":{position:\"5px\"}, \".myClass\":{background:\"red\"}}, etc..."
                     });
                 }
             } else {
-                console.log("provide one paramter as an object containing the cssStyles, like: {\"#myID\":{position:\"5px\"}, \".myClass\":{background:\"red\"}}, etc...");
+                onError({
+                    type:"preloadError"
+                });
             }
-        } else {
-            console.log("run this after the page loads");
-        }
+        });
+
+        !started ? startEvents.push(tmp) : tmp();*/
 
     };
 
-    function makeElements() {
-        //   addOtherElements();
-        var madeElements = [];
-        for (var i = 0; i < self.elements.length; i++) {
-            var x = new self.element(self.elements[i]);
+   /*this.go = (opts) => {
+        var valToFuncDict = {
+            events: addNewEvents,
+            elements: makeElements
+        };
+        opts && opts.constructor == Object ? 
+            Object.keys(opts).forEach(k => {
+                this[k] && this[k].constructor == Function ?
+                    this[k](opts[k])
+                : 0
+            })
+        : 0
+    };*/
 
-            madeElements.push({
-                "data": x["data"],
-                "element": x["el"]
-            });
-        }
-
-        madeElements.forEach((x, i) => {
-            var parentEl = document.body;
-            var p = x["data"]["parent"];
-            if (p) {
-                var temp = madeElements.find(z => {
-
-                    if (z["data"]["attributes"]) return z["data"]["attributes"]["id"] == p;
-                    else return null;
-                });
-
-                if (temp) {
-                    parentEl = temp["element"];
-                }
-            }
-            parentEl.appendChild(x["element"]);
-        });
+    function makeElements(els) {
+        els.forEach(x => new self.element(x));
     }
 
     function addEvent(el, id, type) {
         el.addEventListener(type, (e) => {
             var ev = self.events[id];
-            if(ev && ev.constructor == Function) ev(e);
+            t(ev,Function) && ev(e);
         });
     }
 
@@ -790,3 +958,31 @@ function applyCustomCSSruleListToExistingCSSruleList(customRuleList, existingRul
     }
 }
 
+function t(item, cons) {
+    return (item || item == 0 || item == false || item == "") ? 
+            (cons && cons.constructor == Function) ? 
+                item.constructor == cons
+            :
+                item.constructor.name || item.constructor
+        :
+            item
+}
+
+function obj(item) {
+    return item || {};
+}
+
+function flatten(array) {
+    array.reduce((flatResult, next) => flatResult.concat(next), []);
+}
+
+function addToObj(base, addition) {
+    return Object.fromEntries(
+                Object.entries(base)
+                .concat(
+                    Object.entries(
+                        addition
+                    )
+                )
+            )
+}
