@@ -139,7 +139,6 @@ var COBY = new(function () {
         	this.ws = new WebSocket(opts.url);
           	this.ws.onmessage = m => {
             	t(opts.onmessage,Function) && opts.onmessage(m);
-
             };
           
           	this.ws.onerror = (err) => {
