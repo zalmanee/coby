@@ -160,8 +160,11 @@ var COBY = new(function () {
     };
   
   	function mySocketReconnect(ws) {
-      	var oldURL = ws.url;
-      
+      	if(t(ws, WebSocket)) {
+        	var oldURL = ws.url;  
+        }
+      	
+      	
         if (self.cobysSocket) {
             console.log("connected to websocket with socket:", self.cobysSocket);
             //    self.cobysSocket.removeAllListeners();
