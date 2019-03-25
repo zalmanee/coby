@@ -4,7 +4,7 @@ var COBY = new(function () {
     var self = this,
         empty = (() => {}),
         keyCodes = [],
-        moving = false,
+        moving = false, 
         started = false,
         IzList = [],
         startFunctions = [],
@@ -28,7 +28,7 @@ var COBY = new(function () {
         if(!started) {
             makeElements(self.elements);
 
-            this.loadScripts(this.scriptsToLoad, () => {
+            this.loadScripts(this.scriptsToLoad, () => { 
                 this.startWebsocket(() => {
                     if (callback) {
                         callback();
