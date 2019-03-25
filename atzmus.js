@@ -141,6 +141,7 @@ var COBY = new(function () {
                   opts.onmessage(m);
                 }
             };
+          
           	this.ws.onerror = (err) => {
                 switch (err.code) {
                     case "ECONNREFUSED":
@@ -151,12 +152,22 @@ var COBY = new(function () {
                         break;
                 }
             };
+          
             this.send = msg => {
               this.ws.send(msg);
           	};
         }
-      	
     };
+  
+  function socketReconnect() {
+        if (self.cobysSocket) {
+            console.log("connected to websocket with socket:", self.cobysSocket);
+            //    self.cobysSocket.removeAllListeners();
+            setTimeout(() => {
+                self.startWebsocket();
+            }, self.reconnectInterval || 100);
+        }
+    }
   
     this.loadFile = (url, callback) => {
         if (!callback) {
