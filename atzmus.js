@@ -161,7 +161,14 @@ var COBY = new(function () {
   
   	function mySocketReconnect(ws) {
       	if(t(ws, WebSocket)) {
-        	var oldURL = ws.url;  
+        	var oldURL = ws.url,
+                oldOnMsg = ws.onmessage,
+                oldOnError = ws.onerror;
+                
+          	ws.close();
+          	ws = new WebSocket(oldURL);
+          	ws.onmessage = oldOnMsg;
+          	ws.onerror = oldOnError;
         }
       	
       	
