@@ -354,7 +354,9 @@ var COBY = new(function () {
         Object.keys(x).forEach(v => {
             !exclusions.split(" ").includes(v) && (() => {
               	if(t(x[v], Object])) {
-                	
+                	Object.keys(x[v]).forEach(k => {
+                    	
+                    });
                 } else {
                 	this.el[v] = x[v];
                 }
