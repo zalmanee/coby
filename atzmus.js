@@ -155,6 +155,10 @@ var COBY = new(function () {
             this.send = msg => {
               this.ws.send(msg);
           	};
+          
+          	this.onsocketerror = e => {
+            	console.log("Got an error");
+            };
         }
     };
   
