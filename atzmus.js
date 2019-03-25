@@ -138,9 +138,8 @@ var COBY = new(function () {
     	if(url) {
         	this.ws = new WebSocket(opts.url);
           	this.ws.onmessage = m => {
-            	if(t(opts.onmessage,Function)) {
-                  opts.onmessage(m);
-                }
+            	t(opts.onmessage,Function) && opts.onmessage(m);
+
             };
           
           	this.ws.onerror = (err) => {
