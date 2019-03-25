@@ -127,7 +127,11 @@ var COBY = new(function () {
         };
         head.appendChild(temp);
     }
-
+	
+    this.get = (url, callback) => {
+  		    
+    };
+  
     this.loadFile = (url, callback) => {
         if (!callback) {
             callback = () => {
