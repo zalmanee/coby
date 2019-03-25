@@ -145,7 +145,7 @@ var COBY = new(function () {
           	this.ws.onerror = (err) => {
                 switch (err.code) {
                     case "ECONNREFUSED":
-                        socketReconnect();
+                        mySocketReconnect();
                         break;
                     default:
                         this.onsocketerror(err);
