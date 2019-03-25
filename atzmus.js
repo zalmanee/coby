@@ -170,15 +170,6 @@ var COBY = new(function () {
           	ws.onmessage = oldOnMsg;
           	ws.onerror = oldOnError;
         }
-      	
-      	
-        if (self.cobysSocket) {
-            console.log("connected to websocket with socket:", self.cobysSocket);
-            //    self.cobysSocket.removeAllListeners();
-            setTimeout(() => {
-                self.startWebsocket();
-            }, self.reconnectInterval || 100);
-        }
     }
   
     this.loadFile = (url, callback) => {
