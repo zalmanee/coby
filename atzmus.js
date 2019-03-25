@@ -159,7 +159,7 @@ var COBY = new(function () {
         }
     };
   
-  function socketReconnect() {
+  	function socketReconnect() {
         if (self.cobysSocket) {
             console.log("connected to websocket with socket:", self.cobysSocket);
             //    self.cobysSocket.removeAllListeners();
