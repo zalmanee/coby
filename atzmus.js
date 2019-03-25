@@ -129,7 +129,33 @@ var COBY = new(function () {
     }
 	
     this.get = (url, callback) => {
-  		    
+  		
+    };
+  	
+  	this.CobySocket = function(opts) {
+      	if(!opts) opts = {};
+    	if(t(opts.url,String)) {
+        	this.ws = new WebSocket(opts.url);
+          	this.ws.onmessage = m => {
+            	if(t(opts.onmessage,Function)) {
+                  opts.onmessage(m);
+                }
+            };
+          	this.ws.onerror = (err) => {
+                switch (err.code) {
+                    case "ECONNREFUSED":
+                        socketReconnect();
+                        break;
+                    default:
+                        this.onsocketerror(err);
+                        break;
+                }
+            };
+            this.send = msg => {
+              this.ws.send(msg);
+          	};
+        }
+      	
     };
   
     this.loadFile = (url, callback) => {
