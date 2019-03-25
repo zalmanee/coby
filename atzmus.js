@@ -134,7 +134,7 @@ var COBY = new(function () {
   	
   	this.CobySocket = function(opts) {
       	if(!opts) opts = {};
-      	var url = t(opts, String) ? opts : t(opts, Object) ? opts.url || null;
+      	var url = t(opts, String) ? opts : t(opts, Object) ? opts.url : null;
     	if(url) {
         	this.ws = new WebSocket(opts.url);
           	this.ws.onmessage = m => {
