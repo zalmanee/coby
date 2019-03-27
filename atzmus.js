@@ -83,7 +83,7 @@ var COBY = new(function () {
             }
 
             this.ws.onopen = () => {
-                Q.forEach(x => t(q, Function) && q());
+                Q.forEach(x => t(x, Function) && x());
                 Q = [];
             };
 
