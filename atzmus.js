@@ -135,7 +135,7 @@ var COBY = new(function () {
                 var func = () => {
                     this.ws.send(tryToStringify(msg));
                 };
-                if(this.ws.readyStaty == WebSocket.OPEN) {
+                if(this.ws.readyState == WebSocket.OPEN) {
                     func();
                 } else {
                     Q.push(func);
