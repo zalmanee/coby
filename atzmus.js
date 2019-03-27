@@ -68,10 +68,11 @@ var COBY = new(function () {
     this.CobySocket = function(opts) {
         if (!opts) opts = {};
         var url = t(opts, String) ? opts : t(opts, Object) ? opts.url : null;
-        this.onmessage = () => {};
-        this.onerror = () => {};
+        this.onmessage = opts.onmessage || (() => {});
+        this.onerror = opts.onerror || (() => {});
+        this.onopen = opts.onopen || (() => {});
         var functionDataToDo = {},
-            listeners = {},
+            listeners = opts.listeners || {},
             Q = [];
         console.log(url);
         if (url) {
@@ -83,13 +84,14 @@ var COBY = new(function () {
             }
 
             this.ws.onopen = () => {
+                this.onopen();
                 Q.forEach(x => t(x, Function) && x());
                 Q = [];
             };
 
             this.ws.onmessage = m => {
                 this.onmessage(m);
-                console.log(JSON.parse(m.data));
+                
                 if (isParseable(m.data)) {
                     var j = JSON.parse(m.data);
                     for (var k in j) {
@@ -97,11 +99,11 @@ var COBY = new(function () {
                         if (t(listeners[k], Function)) {
                             listeners[k]();
                         }
-                        console.log(listeners);
+                        
                     }
    
                 } else {
-                    console.log("NOPE");
+
                 }
             };
    
