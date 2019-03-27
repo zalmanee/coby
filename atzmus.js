@@ -71,7 +71,8 @@ var COBY = new(function () {
         this.onmessage = () => {};
         this.onerror = () => {};
         var functionDataToDo = {},
-            listeners = {};
+            listeners = {},
+            Q = [];
         console.log(url);
         if (url) {
             this.ws = new WebSocket(url);
@@ -80,6 +81,12 @@ var COBY = new(function () {
                     if (this[k]) this[k] = opts[k];
                 }
             }
+
+            this.ws.onopen = () => {
+                Q.forEach(x => t(q, Function) && q());
+                Q = [];
+            };
+
             this.ws.onmessage = m => {
                 this.onmessage(m);
                 console.log(JSON.parse(m.data));
@@ -125,14 +132,21 @@ var COBY = new(function () {
             };
    
             this.send = msg => {
-                this.ws.send(tryToStringify(msg));
+                var func = () => {
+                    this.ws.send(tryToStringify(msg));
+                };
+                if(this.ws.readyStaty == WebSocket.OPEN) {
+                    func();
+                } else {
+                    Q.push(func);
+                }
             };
    
         }
     };
 
     this.googleLogin = cb => {
-        
+
     };
    
     function mySocketReconnect(ws) {
