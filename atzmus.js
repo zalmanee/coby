@@ -42,7 +42,7 @@ var COBY = new(function () {
     this.makeElements = makeElements;
     this.start = (callback) => {
         if(!started && self.elements !== null) {
-            makeElements(startElements);
+            makeElements(self.startElements);
  
             this.loadScripts(this.scriptsToLoad, () => {
                 this.startWebsocket(() => {
