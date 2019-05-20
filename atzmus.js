@@ -35,12 +35,14 @@ var COBY = new(function () {
     this.socketFunctionsToDo = null;
     this.scriptsToLoad = [];
 
-    this.elements = [];
+    this.startElements = [];
     this.events = {};
     define();
+    this.elements = makeElements;
+    this.makeElements = makeElements;
     this.start = (callback) => {
-        if(!started) {
-            makeElements(self.elements);
+        if(!started && self.elements !== null) {
+            makeElements(startElements);
  
             this.loadScripts(this.scriptsToLoad, () => {
                 this.startWebsocket(() => {
