@@ -10,7 +10,12 @@
   <button id="go">go</button>
 <script>
   go.onclick = () => {
-    var lol = document.getElementById("lol") || {value:"WOW GOT U"};
+    var lol = document.getElementById("lol") || {value:"WOW GOT U", asdf:2};
+    lol.asdf != 2 && (lol.value= `
+      COBY.go(() => ({
+
+      }))
+    `)
     var str = "";
     try {
      eval(lol.value || str); 
