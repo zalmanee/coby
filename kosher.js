@@ -228,7 +228,7 @@ COBY.go((
 										]
 									}]
 								}
-							}/*,
+							},/*,
 							{
 								formEntry:{
 									label:"CCV",
