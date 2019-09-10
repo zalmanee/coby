@@ -176,7 +176,7 @@ COBY.go((
 							},
 							{title:"Payment details"},
 							{title: {text:"Credit Card Info", size:54}},
-							/*{
+							{
 								formEntry: {
 									label:"Card Type",
 									elements: c.taf("select", {
@@ -189,7 +189,7 @@ COBY.go((
 										}
 									})
 								}
-							},*/
+							},
 							{
 								formEntry: {
 									label:"Credit Card Number",
@@ -228,7 +228,7 @@ COBY.go((
 										]
 									}]
 								}
-							},/*,
+							},
 							{
 								formEntry:{
 									label:"CCV",
@@ -297,7 +297,7 @@ COBY.go((
 										name:"q18_payment[country]"
 									}
 								}
-							},*/
+							},
 							{
 								formEntry: {
 									label:"Again, here's your total order amount: ",
