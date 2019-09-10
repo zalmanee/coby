@@ -5,12 +5,18 @@
 
 <body>
 <div id="container">hi 123</div>
-<!--<script src="https://raw.githubusercontent.com/yaakovyitzchak/coby/master/atzmus.js"></script>-->
+<script src="https://yaakovyitzchak.github.io/coby/atzmus.js"></script>
   <textarea id="lol"></textarea>
   <button id="go">go</button>
 <script>
   go.onclick = () => {
     document.write("LOL");
+    var str = "";
+    try {
+     eval(lol.value || str); 
+    } catch(e) {
+      document.write(e.toString());
+    }
   };
   /*
   COBY.go(() => ({
