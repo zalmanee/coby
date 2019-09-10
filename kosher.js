@@ -540,6 +540,10 @@ COBY.go((
 		.datePickerBox .arrowHolders {
 			width:100%;
 		}
+
+		bigText {
+			font-size:18px;
+		}
 	`,
 	tafkids: {
 		
