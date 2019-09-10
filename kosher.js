@@ -176,7 +176,7 @@ COBY.go((
 							},
 							{title:"Payment details"},
 							{title: {text:"Credit Card Info", size:54}},
-							{
+							/*{
 								formEntry: {
 									label:"Card Type",
 									elements: c.taf("select", {
@@ -189,14 +189,14 @@ COBY.go((
 										}
 									})
 								}
-							},
+							},*/
 							{
 								formEntry: {
 									label:"Credit Card Number",
 									elements: {
 										
 										tag:"input",
-										name:"q18_payment[cc_number]"
+										name:"x_card_num"
 									}
 								},
 							},
@@ -208,7 +208,7 @@ COBY.go((
 										tag:"span",
 										elements: [
 											c.taf("select", {
-												name:"q18_payment[cc_exp_month]",
+												name:"x_exp_month",
 												options: Object.fromEntries(
 													`January Februrary March April May June July August September October November December`.split(" ").map((x,i) => 
 														[x,i + 1]
@@ -216,7 +216,7 @@ COBY.go((
 												)
 											}),
 											c.taf("select", {
-												name:"q18_payment[cc_exp_year]",
+												name:"x_exp_year",
 												options: Object.fromEntries(
 													range(12).map(x => {
 															var cur = (new Date()).getYear() + 1900 + x;
@@ -228,7 +228,7 @@ COBY.go((
 										]
 									}]
 								}
-							},
+							}/*,
 							{
 								formEntry:{
 									label:"CCV",
@@ -297,7 +297,7 @@ COBY.go((
 										name:"q18_payment[country]"
 									}
 								}
-							},
+							},*/
 							{
 								formEntry: {
 									label:"Again, here's your total order amount: ",
@@ -307,6 +307,7 @@ COBY.go((
 											style: {
 												display:"none"	
 											},
+											name: "x_amount",
 											added(x) {
 												form.addToTotalNodeList({
 													node: x.el,
