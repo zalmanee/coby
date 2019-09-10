@@ -26,7 +26,10 @@ COBY.go((
 							{
 								title: "Kosher Order Form"
 							},
-							{paragraph: "For the lunches you can choose from the following:"},
+							{title: {
+								size:20,
+								text:"For the lunches you can choose from the following:"
+							}},
 							{title: {
 								size:24,
 								text: "Sandwiches:"
