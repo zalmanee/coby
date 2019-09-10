@@ -2024,8 +2024,8 @@ var COBY = new(function () {
 						
 						
 						changeMonth(date);
-						datePickerEl.style.left = (dd.offsetLeft - datePickerEl.offsetWidth) + "px";
-						datePickerEl.style.top = (dd.offsetTop - datePickerEl.offsetHeight) + "px";
+					//	datePickerEl.style.left = (dd.offsetLeft - datePickerEl.offsetWidth) + "px";
+					//	datePickerEl.style.top = (dd.offsetTop - datePickerEl.offsetHeight) + "px";
 						
 					}
 					shown = true;
