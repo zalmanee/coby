@@ -9,7 +9,7 @@ COBY.go((
 	elements:[
 		{
 			parent:"cob_container",
-			innerHTML:"hi",
+			
 			className:"coby_content",
 			style:{
 			//	background:"red"
