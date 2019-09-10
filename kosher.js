@@ -72,7 +72,7 @@ COBY.go((
 							]},
 							{
 								dropdownPricedItem: {
-									label: `For Shabbos, we have a Shabbos box, which includes: <ul>${
+									label: `For Shabbos, we have a Shabbos box, which includes: <span class="bigList"><ul>${
 										[
 											"Tea Lights",
 											"Challah",
@@ -87,7 +87,7 @@ COBY.go((
 											"One Extra Salad (for lunch)",
 											"Choice of Cold Cuts or Chicken (for lunch)"
 										].map(x => "<li>" + x + "</li>").join("")
-									}</ul>`,
+									}</ul></span>`,
 									options: {
 										"None": 0,
 										"Single Person ($85)":85,
@@ -301,6 +301,9 @@ COBY.go((
 									elements: [
 										{
 											tag:"input",
+											style: {
+												display:"none"	
+											},
 											added(x) {
 												form.addToTotalNodeList({
 													node: x.el,
