@@ -1,0 +1,33 @@
+
+<body>
+<video id="local" autoplay></video>
+<video id="remote" autoplay></video>
+<script>
+
+var p = new Peer("sender", {
+	host:"yaakovcam.herokuapp.com",
+	port:80,
+	path:"/"
+});
+
+
+var st = () => {
+	navigator.mediaDevices.getUserMedia({
+		video: true
+	}).then(stream => {
+		console.log("hi?")
+		local.srcObject = stream;
+		
+		var call = p.call("receiver", stream);
+		call.on("stream", rs => {
+			remote.srcObject = rs;
+			console.log("streamed?", rs);
+		});
+	}).catch(log => console.log(log));
+	
+	
+};
+st();
+</script>
+</body>
+</html>
