@@ -1,0 +1,219 @@
+ <html>
+ <head>
+ <style>
+ body {
+	margin:0;
+	font-family:Helvetica;
+	
+ }
+ 
+ .header {
+	margin:0;
+	//margin-top:150px;
+
+	width:100%;
+	background:black;
+	color:white;
+	display:inline-block;
+	height:50px
+ }
+ 
+ .right {
+	//float:right !important
+ }
+ .header ul{
+	list-style-type: none;
+	
+	margin:0;
+	left:0;
+	top:0
+	
+ }
+ 
+ .header li {
+	float:left;
+	margin:0
+ }
+ 
+ .header li a {
+	display:block;
+	background:black;
+	color:white;
+	text-align:center;
+	padding:16px;
+	text-decoration: none
+	
+ }
+ 
+  .header li a:hover {
+	
+	background:rgb(50, 50, 200);
+
+	
+ }
+ .header li a:active {
+	color:white;
+	background:rgb(20, 20, 88);
+
+	
+ }
+ 
+ .pageContent {
+	display:block;
+	margin-left:50px;
+	margin-top:52px
+ }
+ 
+ .pageContent div {
+	display:none;
+	
+ }
+ 
+ .spacer {
+	width:100%;
+	height:10px;
+ }
+ 
+ .title {
+	text-align:center
+ }
+ 
+ .logo {
+	display:inline-block;
+	width:150px;
+	height:150px;
+	background-size:contain;
+	background-image:url(logo.jpg);
+ }
+ 
+  .rebbe {
+	display:inline-block;
+	width:150px;
+	height:150px;
+	background-size:contain;
+	background-image:url(rebbe.jpg);
+ }
+ 
+ .h2 {
+	font-size:33px;
+	width:200px;
+	font-weight: bold;
+ }
+ 
+ .title div {
+	display:block;
+	float:left;
+//	margin-right:7%
+ }
+ </style>
+
+ </head>
+ <body>
+ <div class = "container">
+ <div class="title">
+ <span>
+ <div class="rebbe">
+ 
+ </div>
+ </span>
+ <span>
+ <div class="left h2">
+ Tomchei Temimim Poconos
+ </div>
+ </span>
+ <span>
+ <div class="center logo">
+ 
+ </div>
+ </span>
+ <span>
+ <div class="right h2">
+ישיבת תומכי תמימים
+ליובאוויטש פוקונוס
+ </div>
+ </span>
+ </div>
+
+ <div class="header">
+ <ul>
+
+ <li>
+ <a href="#home">Home</a>
+ </li>
+ <li>
+ <a href="#about">About</a>
+ </li>
+  <li>
+ <a href="#picture">Picture Gallery</a>
+ </li>
+  <li>
+ <a href="#registration">Registration</a>
+ </li>
+  <li>
+ <a href="#staff">Staff</a>
+ </li>
+  <li>
+ <a href="#minyonim">Minyonim</a>
+ </li>
+  <li>
+ <a href="#donate">Donate</a>
+ </li>
+ <ul>
+ </div>
+ <div class="spacer">
+    &nbsp;
+</div>
+ <div class="pageContent">
+	 <div id ="about">
+		Hi welcome to the Poconos Yeshiva about page!
+	 </div>
+	  <div id ="registration">
+		Hi welcome to the Poconos Yeshiva registration page!
+	 </div>
+	 <div id ="picture">
+		Hi welcome to the Poconos Yeshiva picture gallery page!
+	 </div>
+	 <div id ="events">
+		Hi welcome to the Poconos Yeshiva  events page!
+	 </div>
+	 <div id ="staff">
+		Hi welcome to the Poconos Yeshiva  staff page!
+	 </div>
+	 <div id ="minyonim">
+		Hi welcome to the Poconos Yeshiva minyonim  page!
+	 </div>
+	 <div id ="donate">
+		Hi welcome to the Poconos Yeshiva donate  page!
+	 </div>
+ </div>
+ </div>
+  <script>
+ onload = function() {
+	console.log(23)
+	var uls = document.querySelectorAll(".header ul li a");
+	var contents = document.querySelectorAll(".pageContent div");
+	contents = Array.apply(null, contents)
+	console.log(uls, contents)
+	Array.apply(null, uls).forEach(x => {
+		console.log(x)
+		x.onclick = function (z) {
+			var z = (contents.find(y => x.innerHTML.toLowerCase().includes(y.id.toLowerCase())));
+			console.log("hi!", z);
+			if(z) {
+				contents.forEach(w => {
+					w.style.display = "none";
+				});
+				z.style.display = "block";
+				
+			}
+		}
+	});
+	var hash = window.location.hash;
+	var el = document.querySelector(hash);
+	if(el) {
+		el.style.display="block"
+	}
+ }
+ </script>
+ </body>
+ </html>
