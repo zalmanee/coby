@@ -217,6 +217,13 @@
 		el.style.display="block"
 	}
 events.innerHTML="®^¥¢ππ";
+fetch("https://docs.google.com/document/d/1LEafdvpR7PbO5Fe4t3jli3JrQgXgTzPMBAh3jHyenzk/export?format=html", {
+method:"GET",
+headers: {
+"Content-Type":"text/plain"
+}
+}). then (r=>r.text()).
+then (r=>events.innerHTML+=r)
  }
  </script>
  </body>
